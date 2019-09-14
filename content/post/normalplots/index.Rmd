@@ -1,0 +1,265 @@
+---
+title: Visualizing Normal Distributions
+author: Gregory Penn
+date: '2019-09-12'
+slug: visualizing-normal-distributions
+categories: [Tutorials]
+tags: [Visualization, ggplot2, Distributions]
+subtitle: ''
+summary: 'A tutorial for creating automatically formatted plots of normal distributions with arbitrary parameters using R and ggplot2. The method uses functional programming and is easily extensible to any distribution in the stats package.'
+authors: []
+lastmod: '2019-09-12T14:03:49-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+*An exercise in effective visualization and reusable code*
+
+This post started life as a note-to-self, a reminder how to plot distribution functions, which I seem prone to forgetting. Somewhere on my todo list is to wrap the code into a package for plotting all the canonical distributions. 
+
+This post describes the development of [R](https://cran.r-project.org) code with [ggplot2](http://ggplot2.tidyverse.org/index.html) for visualizing normal distributions, which can easily be extended to other distributions. The example illustrates some useful concepts related to:
+
+- Effective visualizations
+- Reusable code
+- Functional programming
+
+I also have a tutorial very similar to this for beta distributions, the code for which was used in my post about Bayes on the Back of a Napkin. Let me know in the comments if you'd like me to post it.
+
+*Motivation:* Visualizing distributions of random variables is one of those things that I seem to be doing all the time. So time spent developing reusable code for the purpose has been worthwhile. One dividend has been a small library of functions that simplify visualizing different parameterizations of canonical distributions. The goal is to have a simple function that produces a useful visualization from no more parameters than necessary.
+
+The following sections illustrate incremental improvements and the thought process that drives them. If you find this too basic, skip to the [finished function](#final) at the end. References to ggplot functions in the text are hyperlinked to their [documentation](http://ggplot2.tidyverse.org/reference/index.html), where you can find a lot more options and information.
+
+## First Steps
+
+Load [ggplot2](http://ggplot2.tidyverse.org) and create a data frame with the variables that describe the axes of the plot. The range of values in the dataframe should represent (or at least contain) the range that we want to plot (we'll make this more flexible later), but particular values within the ranges don't matter. We'll also create an empty plot, mapping *x* to the *x*-axis and density to the *y*-axis, and dressed up with [`theme_bw`](http://ggplot2.tidyverse.org/reference/ggtheme.html).
+
+```{r setup}
+library(ggplot2)
+
+df <- data.frame(x = c(-4, 4), density = c(0, 1))
+p <- ggplot(df, aes(x = x, y = density)) + theme_bw()
+```
+
+Now we'll use [`stat_function`](http://ggplot2.tidyverse.org/reference/stat_function.html) to add a layer to the plot with the normal density function. Note that [`stat_function`](http://ggplot2.tidyverse.org/reference/stat_function.html) expects the function we provide to take a single argument, which is mapped to the plot's *x*-axis; the value it returns is mapped to the *y*-axis. The function [`dnorm`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Normal.html) will do this for it's default parameterization of mean = 0, sd = 1. We'll communicate the distribution's parameters with a title.
+
+```{r first_plot}
+p + stat_function(fun = dnorm) +
+    ggtitle(paste0("PDF Normal(", 0, ", ", 1, ")"))
+
+```
+
+Pretty, but if we want to use a different parameterization, we have to provide a function that will return what we expect when provided with a single argument. So we'll define a new function to do the job with the parameters we want. And we'll create a new title for our new parameters. And now an interesting part of the distribution falls off the plot. So new parameters are a pain.
+
+```{r second_plot}
+p + stat_function(fun = function (x) { dnorm(x, 3, 2) }) +
+      ggtitle(paste0("PDF Normal(", 3, ", ", 2, ")"))
+
+```
+
+## Functional programming to the rescue
+
+We could manually create a new data frame with a better range of *x* values, but that's only one of many things we'll want to tweak for different parameterizations of the distribution. Much better if we can automatically generate an appropriate range with a function. We'll provide a sensible default for the width of the plot (in standard deviations), so we won't have to specify anything but mean and sd unless we want something different. The ranges of the axes are by default determined by the range of the data. The range of *x* data is determined by our data frame. The range of the *y*-axis for density data is determined by the density function over the range of *x*, but there are some tweaks that can unexpectedly result in a different range so we'll set the range of the *y* axis to be between 0 and the the density at the mean, which for this distribution is its maximum value. The result is easily reusable code in the form of a function that takes two or three parametets as arguments and returns a nice plot.
+
+```{r first_programatic_plot}
+plot_normal <- function (mean, sd, deviations = 4) {
+  
+  # Specialize dnorm for our parameters, leaving x variable
+  dnorm_f <- function (x) { dnorm(x, mean, sd) }
+  # Specialize stat_function for our density function
+  stat_dnorm <- stat_function(fun = dnorm_f)
+  
+  # Range to plot
+  x_max <- mean + sd * deviations
+  x_min <- mean - sd * deviations
+  y_max <- dnorm_f(mean)
+
+  # Dataframe for ggplot
+  df <- data.frame(x = c(x_min, x_max), density = c(0,y_max))
+
+  # Make the plot  
+  p <- ggplot(df, aes(x = x, y = density)) +
+    stat_dnorm +
+    ggtitle(paste0("PDF Normal(", mean, ", ", sd, ")")) +
+    theme_bw()
+  
+  # Return the plot
+  return(p)
+  
+}
+
+plot_normal(3,2)
+```
+
+## Visual improvements
+
+### Adding mass
+The area under the curve is meaningful; it's the mass of the distribution, but that isn't conveyed by our plot. We can add visual mass by filling the area with a heavier grey. A darker gray boundary line will subtly emphasize the area's delination.
+
+```{r adding_mass}
+plot_normal <- function (mean, sd, deviations = 4) {
+  
+  # Specialize dnorm for our parameters, leaving x variable
+  dnorm_f <- function (x) { dnorm(x, mean, sd) }
+  # Specialize stat_function for our density function
+  stat_dnorm <- stat_function(fun   = dnorm_f,
+                              geom  = "area",
+                              fill  = "grey",
+                              color = "dark grey")
+  
+  # Range to plot
+  x_max <- mean + sd * deviations
+  x_min <- mean - sd * deviations
+  y_max <- dnorm_f(mean)
+
+  # Dataframe for ggplot
+  df <- data.frame(x = c(x_min, x_max), density = c(0, y_max))
+  
+  # Make the plot  
+  p <- ggplot(df, aes(x = x, y = density)) +
+    stat_dnorm +
+    ggtitle(paste0("PDF Normal(", mean, ", ", sd, ")")) +
+    theme_bw()
+  
+  # Return the plot
+  return(p)
+  
+}
+
+plot_normal(-12,2000)
+```
+
+
+### Illustrating variance
+
+We don't have a good visual handle on the distribution's units of variance; we want to see standard deviations. Changing the plot's background grid and *x*-axis labels to be meaningful can help with that. We'll make each *x*-axis tick and major vertical line on the grid represent one standard deviation, minor lines will represent half-deviations. We can make those changes by specifying [`scale_x_continuous`](http://ggplot2.tidyverse.org/reference/scale_continuous.html). Since the grid will be meaningful, we'll make it visible underneath the distribution's mass with a little transparency by setting an alpha value for our `stat_dnorm`.
+
+```{r adding_variance}
+plot_normal <- function (mean, sd, deviations = 4) {
+  
+  # Specialize dnorm for our parameters, leaving x variable
+  dnorm_f <- function (x) { dnorm(x, mean, sd) }
+  # Specialize stat_function for our density function
+  stat_dnorm <- stat_function(fun   = dnorm_f,
+                              geom  = "area",
+                              fill  = "grey",
+                              color = "dark grey",
+                              alpha = 0.5)
+  
+  # Range to plot
+  x_max <- mean + sd * deviations
+  x_min <- mean - sd * deviations
+  y_max <- dnorm_f(mean)
+  
+  # Range of standard deviations to annotate
+  sds_limit <- floor(deviations)
+  x_sds_min <- mean - sd * sds_limit
+  x_sds_max <- mean + sd * sds_limit
+
+  # X-axis tick interval is sd size
+  x_axis_breaks <- seq(from = x_sds_min, to = x_sds_max, by = sd)
+
+  # Dataframe for ggplot
+  df <- data.frame(x = c(x_min, x_max), density = c(0, y_max))
+  
+  # Make the plot  
+  p <- ggplot(df, aes(x = x, y = density)) +
+    stat_dnorm +
+    scale_x_continuous(breaks = x_axis_breaks) +
+    ggtitle(paste0("PDF Normal(", mean, ", ", sd, ")")) +
+    theme_bw()
+  
+  # Return the plot
+  return(p)
+  
+}
+
+plot_normal(316, 7)
+```
+
+### Communicating relative mass
+
+Finally, human visual perception isn't very good at comparing the relative sizes of areas (at least compared with our ability to compare lengths). So we have difficulty perceiving how much mass is represented by different areas under the density curve. This is why the cummulative mass distribution is a separately useful plot; it communicates that information via the height differences that this plot uses to communicate density. But we can compensate a little for our plot's weakness as a stand-alone visualization by adding a second *x*-axis with labels that convey this information quantitatively.  In our final plot, we'll use the quantiles of the distribution at each axis tick, labeled above the plot. Our function will make this feature optional, because a second *x*-axis with a different and non-constant scale is potentially confusing.
+
+We'll get the values for those axis labels and create the axis as follows:
+
+1. Specialize the base R function [`pnorm`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Normal.html) for our parameters,
+2. Apply it to our vector `x_axis_breaks` to create a corresponding vector of quantiles.
+3. Create the second axis with [`scale_x_continuous`](http://ggplot2.tidyverse.org/reference/scale_continuous.html), setting `sec.axis` to [`dup_axis`](http://ggplot2.tidyverse.org/reference/sec_axis.html) with a name and labels, rounded to three digits.
+
+## The finished (for now) function {#final}
+
+Our function is now pretty flexible and useful; it's what produced the plot at the beginning of this post. Additional tweaks and modifications are relatively easy, due to the organization and modularity of the code. To illustrate this, I've added one more decoration in the form of optional vertical lines deliniating sd boundaries in the distribution. I still haven't decided whether I like them, but it's easy to set the default value to `FALSE` and leaving them in the code is useful as a recipe I can refer to if I want to remember how to do that for another plot.
+
+```{r final}
+plot_normal <- function (mean = 0, sd = 1, deviations = 4,
+                         quantile_axis = TRUE, sd_lines = TRUE) {
+  require(ggplot2)
+  # Specialize density and quantile, and stat
+  dnorm_f <- function (x) { dnorm(x, mean, sd) }
+  pnorm_f <- function (x) { pnorm(x, mean, sd) }
+  stat_dnorm <- stat_function(fun   = dnorm_f,
+                              geom  = "area",
+                              fill  = "grey",
+                              color = "darkgrey",
+                              alpha = 0.5)
+
+  # Range to plot
+  x_max <- mean + sd * deviations
+  x_min <- mean - sd * deviations
+  y_max <- dnorm_f(mean)
+
+  # Range of standard deviations to annotate
+  sds_limit <- floor(deviations)
+  x_sds_min <- mean - sd * sds_limit
+  x_sds_max <- mean + sd * sds_limit
+
+  # X-axis tick interval is sd size
+  x_axis_breaks <- seq(from = x_sds_min, to = x_sds_max, by = sd)
+  scale_x <- scale_x_continuous(breaks = x_axis_breaks)
+
+  # Quantile at each tick for second axis
+  quantiles <- pnorm_f(x_axis_breaks)
+  scale_x_with_quantiles <- {
+    scale_x_continuous(breaks = x_axis_breaks,
+                     sec.axis = dup_axis(labels = round(quantiles, 3),
+                                         name = "quantile"))
+  }
+
+  # Quantile at each tick for second axis
+  quantiles <- pnorm_f(x_axis_breaks)
+
+  # Dataframe for ggplot
+  df <- data.frame(x = c(x_min,x_max), density = c(0, y_max))
+
+  # Make the plot  
+  plt <- ggplot(df, aes(x = x, y = density)) +
+    stat_dnorm +
+    ggtitle(paste0("PDF Normal(", mean, ", ", sd, ")")) +
+    theme_bw()
+  
+  if (quantile_axis) { plt <- plt + scale_x_with_quantiles }
+  else { plt <- plt + scale_x }
+
+  if (sd_lines) {
+    sd_line <- function (x, dmax) {
+      geom_linerange(x=x, ymin=0, ymax=dmax,
+                     color="dark grey", linetype="dotted")
+    }
+    for (dev in 0:floor(deviations)) {
+      x_low  <- mean - sd * dev
+      x_high <- mean + sd * dev
+      plt <- plt + sd_line(x_low,  dnorm_f(x_low))
+      plt <- plt + sd_line(x_high, dnorm_f(x_high))
+    }
+  }
+  return(plt)
+}
+
+plot_normal(42, 0.25)
+```
+
+

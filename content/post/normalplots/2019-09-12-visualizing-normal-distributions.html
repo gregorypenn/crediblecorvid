@@ -1,0 +1,30 @@
+---
+title: Visualizing Normal Distributions
+author: Gregory Penn
+date: '2019-09-12'
+slug: visualizing-normal-distributions
+categories: []
+tags: []
+subtitle: ''
+summary: 'A tutorial for creating automatically formatted plots of normal distributions with arbitrary parameters using R and ggplot2. The method uses functional programming and is easily extensible to any distribution in the stats package.'
+authors: []
+lastmod: '2019-09-12T14:03:49-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p><em>An exercise in effective visualization and reusable code</em></p>
+<p>This post describes the development of <a href="https://cran.r-project.org">R</a> code with <a href="http://ggplot2.tidyverse.org/index.html">ggplot2</a> for visualizing normal distributions, which can easily be extended to other distributions. The example illustrates some useful concepts related to:</p>
+<ul>
+<li>Effective visualizations</li>
+<li>Reusable code</li>
+<li>Functional programming</li>
+</ul>
+<p><em>Motivation:</em> Visualizing distributions of random variables is one of those things that I seem to be doing all the time. So time spent developing reusable code for the purpose has been worthwhile. One dividend has been a small library of functions that simplify visualizing different parameterizations of canonical distributions. The goal is to have a simple function that produces a useful visualization from no more parameters than necessary.</p>
+<p>The following sections illustrate incremental improvements and the thought process that drives them. If you find this too basic, skip to the <a href="#final">finished function</a> at the end. References to ggplot functions in the text are hyperlinked to their <a href="http://ggplot2.tidyverse.org/reference/index.html">documentation</a>, where you can find a lot more options and information.</p>

@@ -1,0 +1,7 @@
+.DS_Store
+
+blogdown/
+public/
+ignore/
+.Rproj.user
+.ignore

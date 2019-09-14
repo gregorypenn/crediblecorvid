@@ -1,0 +1,661 @@
+---
+title: Bayes on the Back of a Napkin
+subtitle: 'Priors, posteriors, and the weight of evidence'
+author: Gregory Penn
+date: '2019-09-12'
+slug: bayes-on-a-napkin
+categories: [Tutorials]
+tags: [Bayesian, Probability, Priors]
+summary: 'Examples of Bayesian inference that are intuitive and so easy that they fit on a napkin are rare. Estimating the probability of an event given some data happens to be that easy. And it provides an clear example of the role of priors in Bayesian inference.'
+authors: []
+lastmod: '2019-09-12T09:34:07-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+
+<div id="fitting-bayes-on-a-napkin" class="section level2">
+<h2>Fitting Bayes on a Napkin</h2>
+<p>Examples of Bayesian inference that are intuitive and so easy that they fit on a napkin are rare. However, estimating the probability of an event, given some data, can be that easy. And it provides an clear example of the role of prior beliefs (i.e. <em>priors</em>) in Bayesian inference.</p>
+</div>
+<div id="modeling-probabilities" class="section level2">
+<h2>Modeling probabilities</h2>
+<p>We are often interested in estimating the probability that an event will occur–a <em>success</em> henceforth–based on limited data. A Bayesian method using beta distributions is particularly useful for this, as predictions are easy to calculate by hand and model parameters are few (only 2) and have intuitive, real-world interpretations. In the following sections, we’ll introduce the beta distribution for probabilities, discuss the selection of appropriate priors, and work through examples. The examples begin with simple, non-conditional coin tossing and then move to the conditional probabilities of species co-occurance in ecology.</p>
+<div id="the-beta-distribution" class="section level3">
+<h3>The beta distribution</h3>
+<p>In Bayesian inference, we consider our belief about a thing to be distributed over some range of possibilities. For example, I believe the probability of heads in a coin toss is most likely around 50%, but it might be little more or less. We can model the distribution of that belief as a beta distribution, illustrated by the probability density function below.</p>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-1-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Note that the range of the beta distribution is bounded between zero and one, just like probabilities. The <em>x</em>-axis represents the probability we are estimating and the <em>y</em>-axis represents how likely any given probability is. The probability (<em>x</em>-axis) corresponding to the peak of the curve is the value we think most likely, i.e. the distribution’s mode. The shape of the beta distribution depends on two shape parameters, <span class="math inline">\(\alpha_1\)</span> and <span class="math inline">\(\alpha_2\)</span>. For the distribution above, their values are 100 and 100.</p>
+<p>We can interpret the parameter <span class="math inline">\(\alpha_1\)</span> as the number of successes (heads) and <span class="math inline">\(\alpha_2\)</span> as the number of failures (tails) that we know of. The total weight of evidence supporting our belief is the sum <span class="math inline">\(\alpha_1 + \alpha_2\)</span>. The weight of evidence affects the variance of the distribution, which represents our (lack of) confidence. High variance (wide spread) means low confidence, low variance means high confidence.</p>
+<p>We can calculate the expected value of a beta distribution with a simple formula.</p>
+<p><span class="math display">\[
+\mathbf{E} = \frac{\alpha_1}{\alpha_1 + \alpha_2}.
+\]</span></p>
+<p>So I estimate that the probability of heads is 0.5 (the expected value of the distribution) and I’m 95% sure that the actual probability is between 0.431 and 0.569, the bounds of the shaded 95% <em>credible interval</em> in the plot above. This intuitive interpretation of the credible interval is exactly what many people mistakenly believe that a frequentist confidence interval means.</p>
+</div>
+</div>
+<div id="priors" class="section level2">
+<h2>Priors</h2>
+<p>If we take this distribution as a prior, it will have the <em>weight</em> of evidence of having seen 200 coin flips, of which 100 were heads. Now if I see you flip a coin and get 8 heads and 2 tails, I should modify my belief to account for the new data. My posterior belief is distributed as
+Beta(100 + 8, 100 + 2). The fact that my prior is in the same form as my posterior (i.e. a beta distribution) means that it is a congugate prior, which can be very convenient but is not necessary.</p>
+<p>The posterior distribution is shown below, with the prior overlaid as a dotted line so we can see the result of the update of our beliefs. We didn’t change much, because our new evidence was a scant 10 tosses compared to the weight of our prior, which was based on observing 200 tosses. This is consistent with our intuition that if someone pulls out a normal looking coin and tosses a few heads in a row, that’s not enough evidence for us to decide that the game must be rigged.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-3-1.png" alt="Posterior distribution after seeing 8 heads and 2 tails" width="75%" />
+<p class="caption">
+Figure 1: Posterior distribution after seeing 8 heads and 2 tails
+</p>
+</div>
+<p>The choice of a particular prior should be deliberate. Informative priors are a powerful tool for making the most of data that is limited and difficult to obtain. Simply put, they can result in more accurate inference when used properly.</p>
+<div id="noninformative-priors" class="section level3">
+<h3>Noninformative priors</h3>
+<blockquote>
+<p>… a “noninformative” prior does not necessarily refer to a flat or a uniform prior, but to a distribution that lets the likelihood play a major role in forming the posterior distribution <span class="citation">[@Kerman:2011gp]</span>.</p>
+</blockquote>
+<p>“Noninformative” priors minimize the risk that prior information is misleading for some reason. But the term “noninformative” is misleading, because prior assumptions always underly an analysis (equally true for frequentist methods) and even priors that aren’t supposed to influence the results can do so. Our prior for the coin was strongly informative, because it had a lot more weight of evidence than our new observations (200 cf 10). In the following sections, we’ll see how our posterior belief in the probability of heads would differ using a selection of standard weakly informative (a.k.a. “noninformative”) priors.</p>
+<div id="haldanes-prior-of-beta0-0" class="section level4">
+<h4>Haldane’s prior of Beta(0, 0)</h4>
+<p>The improper<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Haldane prior represents the prior belief that we know nothing but the new data we’ve just seen, the philosophy underlying fequentist estimation. It has no expected value, as the formula would require dividing by zero. It results in a posterior with expected value equal to the maximum likelihood estimate (i.e. the sample mean) and so is the most prone to pulling posteriors toward the extremes when the proportion of successes in the sample is small or large. It also results in improper posteriors (sum of probabilities not equal to one) when either all or none of the samples result in success. The Haldane prior and resulting posterior distribution of belief, distributed as Beta(0 + 8, 0 + 2), are shown below.</p>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-4-1.png" width="75%" style="display: block; margin: auto;" /><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-4-2.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="kermans-neutral-prior-beta13-13" class="section level4">
+<h4>Kerman’s Neutral prior Beta(1/3, 1/3)</h4>
+<p>Our posterior is now Beta(1/3 + 8, 1/3 + 2). This prior has the attractive property that rather than shrinking posterior quantiles toward the extremes or the center as other “uninformative” priors, it results in posteriors with a 50% chance that the true value is either larger or smaller than the expected value. This is especially relevant for small samples and cases where the true probability of success is near 0 or 1 <span class="citation">[@Kerman:2011gp]</span>.</p>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-5-1.png" width="75%" style="display: block; margin: auto;" /><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-5-2.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="jeffreys-prior-beta12-12" class="section level4">
+<h4>Jeffreys prior Beta(1/2, 1/2)</h4>
+<p>Jeffreys prior is another popular option. It has the attractive property that it is invariant under reparameterization of the distribution, but we have no interest in reparameterizing our beta distributions here. When the proportion of successes in the sample is small or large, Jeffreys prior tends to bias posterior quantiles toward the center. Our posterior under Jeffreys prior is Beta(1/2 + 8, 1/2 + 2).</p>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-6-1.png" width="75%" style="display: block; margin: auto;" /><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-6-2.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="bayes-laplace-uniform-prior-beta1-1" class="section level4">
+<h4>Bayes-Laplace uniform prior Beta(1, 1)</h4>
+<p>The Bayes-Laplace uniform prior has equal density over all possible values. Such a uniform prior is the unstated assumption of frequentists. It results in infered parameters that maximize the probability of the observed data under the prior assumption that all values are equally likely, i.e. a <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum likelihood estimator</a>. Even more than Jeffreys prior, it biases posteriors toward the center when the proportion of successes in the sample is small or large. Our posterior with the uniform prior is Beta(1 + 8, 1 + 2).</p>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-7-1.png" width="75%" style="display: block; margin: auto;" /><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-7-2.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="estimating-conditional-probabilities" class="section level2">
+<h2>Estimating conditional probabilities</h2>
+<p>Plants are more interesting than coin tosses. This section demonstrates how our method can be applied to predicting the presence of one species of plant by the presence of another. This is useful when we’re interested in locating particular plants, but the environmental variables underlying its distribution are imperceptible to us. We’ll illustrate this example with data from botanical surveys in the vicinity of where a new species, <em>Muilla lordsburgana</em>, was recently discovered by <a href="http://www.polyploid.net">Patrick Alexander</a>.</p>
+<p>We’ll consider three measures of an associated species’s success as a binary predictor<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> of <em>M lordsburgana</em>.</p>
+<ul>
+<li>Sensitivity is a measure of what proportion of our target species we’d find if we looked everywhere our predictor exists.</li>
+<li>Precision is a measure of what proportion of “yes” predictions will be correct.</li>
+<li>Accuracy is a measure what proportion of predictions (yes and no) will be correct.</li>
+</ul>
+<p>From our survey data we create a contingency table of observation counts. The following contingency table is for target species S = <em>Muilla Lordsburgana</em> (MUILL) and associate A = <em>Pectocarya platycarpa</em> (PEPL). Recall that of the two beta parameters, <span class="math inline">\(\alpha_1\)</span> indicates successes and <span class="math inline">\(\alpha_2\)</span> indicates failures, though what constitutes a success and a failure depends on whether we’re thinking of sensitivity, precision, or accuracy. We’ll use the Neutral prior Beta(1/3, 1/3) and add the weight of evidence from the table to estimate the conditional probabilities of associate and target co-occurance.</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+S
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0
+</th>
+<th style="text-align:right;">
+1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="2">
+<td colspan="3" style="border-bottom: 1px solid;">
+<strong>A</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+0
+</td>
+<td style="text-align:right;">
+166
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+</tbody>
+</table>
+<div id="the-sample-space" class="section level3">
+<h3>The sample space</h3>
+<p>The term “sample space” refers to the whole world of possilibilites from the perspective of our analysis. Everything that could happen exists in the sample space. One key to understanding conditional probability is seeing how it constricts the sample space. In the contingency table above, the sample space consists of four mutually exclusive possibilities, based on the presence or absence of each species.</p>
+<p><em>Notation:</em> <span class="math inline">\(\Pr(Y|X)\)</span> means the probability that <em>Y</em> is true when <em>X</em> is true, a probability conditional on <em>X</em>.</p>
+<div id="sensitivity-pas" class="section level4">
+<h4>Sensitivity P(A|S)</h4>
+<p>Sensitivity is the probability that the associate will be present when the target species is. A lack of sensitivity means that you’ll miss a lot of your target species when relying on the associate as an indicator. The sample space is constricted to the right column, where S is always present. A success is when A is present, failure is the absence of A. Adding evidence from the table to our Neutral prior, our posterior belief in P(A|S) is Beta(1/3 + 12, 1/3 + 5).</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+S
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0
+</th>
+<th style="text-align:right;">
+1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="2">
+<td colspan="3" style="border-bottom: 1px solid;">
+<strong>A</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+0
+</td>
+<td style="text-align:right;">
+166
+</td>
+<td style="text-align:right;background-color: yellow !important;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;background-color: yellow !important;">
+12
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-9-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="influence-of-prior-on-posterior-of-sensitivity" class="section level5">
+<h5>Influence of prior on posterior of sensitivity</h5>
+<p>Our estimates of the probability P(A|S) are affected by our choice of prior, with <em>p</em> ranging from 0.684 to 0.706 and credible intervals varying over a similar range (see table below). The magnitude of the influence is largely a function of the ammount of new data we have. For sensitivity and precision, our sample space is constricted and only 17 of our 188 observations are relevant, so the proportion of prior weight in the posterior ranges from 0 to about 5.9%. For this particular analysis, the influence of prior is probably much less than that of other decisions, such as where to place geographic bounds on the sample data.</p>
+<pre><code>## Warning: `data_frame()` is deprecated, use `tibble()`.
+## This warning is displayed once per session.</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-10-1.png" width="75%" style="display: block; margin: auto;" /></p>
+For sensitivity P(A|S): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+prior
+</th>
+<th style="text-align:right;">
+a
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+lower
+</th>
+<th style="text-align:right;">
+upper
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Haldane
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.7059
+</td>
+<td style="text-align:right;">
+0.4762
+</td>
+<td style="text-align:right;">
+0.8898
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Neutral
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+0.6981
+</td>
+<td style="text-align:right;">
+0.4721
+</td>
+<td style="text-align:right;">
+0.8817
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jeffreys
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.6944
+</td>
+<td style="text-align:right;">
+0.4702
+</td>
+<td style="text-align:right;">
+0.8778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uniform
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+0.6842
+</td>
+<td style="text-align:right;">
+0.4652
+</td>
+<td style="text-align:right;">
+0.8666
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="precision-psa" class="section level4">
+<h4>Precision P(S|A)</h4>
+<p>Precision is the probability that the target species will be present when the associate is. The sample space is constricted to the bottom row where A is always present. Success is when S is also present, failure is the absence of S. Because our data contains identical numbers of observations where S was present and A absent, and visa versa, our estimates for the precision and sensitivity are identical and our posterior is again Beta(1/3 + 12, 1/3 + 5).</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+S
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0
+</th>
+<th style="text-align:right;">
+1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="2">
+<td colspan="3" style="border-bottom: 1px solid;">
+<strong>A</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+0
+</td>
+<td style="text-align:right;">
+166
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;background-color: yellow !important;" indentlevel="1">
+1
+</td>
+<td style="text-align:right;background-color: yellow !important;">
+5
+</td>
+<td style="text-align:right;background-color: yellow !important;">
+12
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-12-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="influence-of-prior-on-posterior-of-precision" class="section level5">
+<h5>Influence of prior on posterior of precision</h5>
+<p>Identical to our analysis of the posterior of sensitivity.</p>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-13-1.png" width="75%" style="display: block; margin: auto;" /></p>
+For precision P(S|A): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+prior
+</th>
+<th style="text-align:right;">
+a
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+lower
+</th>
+<th style="text-align:right;">
+upper
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Haldane
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.7059
+</td>
+<td style="text-align:right;">
+0.4762
+</td>
+<td style="text-align:right;">
+0.8898
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Neutral
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+0.6981
+</td>
+<td style="text-align:right;">
+0.4721
+</td>
+<td style="text-align:right;">
+0.8817
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jeffreys
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.6944
+</td>
+<td style="text-align:right;">
+0.4702
+</td>
+<td style="text-align:right;">
+0.8778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uniform
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+0.6842
+</td>
+<td style="text-align:right;">
+0.4652
+</td>
+<td style="text-align:right;">
+0.8666
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="accuracy-psa-or-sa" class="section level4">
+<h4>Accuracy P(S,A OR !S,!A)</h4>
+<p>Accuracy is the probability that the associate will be correct as a binary predictor, i.e. that the target species will be present when the associate is present and absent when the associate is absent. So we define success as an observation where both or neither were present. Because <em>both</em> and <em>neither</em> are mutually exclusive, we can use the addition rule of probability and express accuracy as
+<span class="math display">\[
+\Pr(S,A \mathrm{~OR~} !S,!A) = \Pr(S,A) + \Pr(!S,!A)
+\]</span></p>
+<p>And so we simply add our observed success and failures from the contingency table to our beta prior as before. The sample space is not constricted, because accuracy considers all possible outcomes. Successes are the top left corner (!S, !A) and the bottom right corner (S, A). Failures are in the other diagional. Our posterior belief in the accuracy of this predictor is distributed as Beta(1/3 + 12 + 166, 1/3 + 5 + 5).</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+S
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0
+</th>
+<th style="text-align:right;">
+1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="2">
+<td colspan="3" style="border-bottom: 1px solid;">
+<strong>A</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+0
+</td>
+<td style="text-align:right;">
+166
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-15-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="effect-of-sample-size-on-confidence" class="section level5">
+<h5>Effect of sample size on confidence</h5>
+<p>We see that the posterior distribution for accuracy is much narrower than that for sensitivity and precision. This is a function of the additional weight of evidence in support of our posterior for accuracy. We have 188 observations relevant to accuracy, and only 17 relevant to sensitivity and precision. The widths of the credible intervals are 41% with 17 observations and 6% with 188, clearly illustrating how confidence changes as a function of sample size.</p>
+</div>
+<div id="influence-of-prior-on-posterior-of-accuracy" class="section level5">
+<h5>Influence of prior on posterior of accuracy</h5>
+<p>Our posterior belief in the accuracy of A as a predictor of S is less affected by choice of prior than were sensitivity and precision. The reason for the difference is that the additional weight of evidence (188 cf 17 observations) overwhelmed the differences between priors.</p>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
+<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
+<p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-16-1.png" width="75%" style="display: block; margin: auto;" /></p>
+For accuracy P(S,A) + P(!S,!A): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+prior
+</th>
+<th style="text-align:right;">
+a
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+lower
+</th>
+<th style="text-align:right;">
+upper
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Haldane
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.9468
+</td>
+<td style="text-align:right;">
+0.9106
+</td>
+<td style="text-align:right;">
+0.9741
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Neutral
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+0.9452
+</td>
+<td style="text-align:right;">
+0.9087
+</td>
+<td style="text-align:right;">
+0.9729
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jeffreys
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.9444
+</td>
+<td style="text-align:right;">
+0.9077
+</td>
+<td style="text-align:right;">
+0.9723
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uniform
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+0.9421
+</td>
+<td style="text-align:right;">
+0.9049
+</td>
+<td style="text-align:right;">
+0.9706
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Our beliefs can be represented as a distribution over possibilities. The expected value of the distribution is our best point-estimate and the variance indicates our (lack of) confidence. In the case of a belief in a probability, the evidence supporting our belief is convieniently represented as the two parameters of a beta distribution. Arriving at a posterior belief after considering new evidence is as simple as adding the new evidence to the old in the form of the beta parameters. The expected value (point-estimate) is easily calculated as <span class="math inline">\(\frac{\alpha_1}{\alpha_1 + \alpha_2}\)</span>. Credible intervals are a little more complicated, but are simply the symetric quantiles of the distribution that bound the desired interval, trivial to calculate with free software like R.</p>
+<p>Choice of prior should be deliberate, particularly whether to use a prior that’s more than weakly informative. Informative priors can be especially useful when new data is limited and difficult to obtain. However, for the assortment of commonly used “uninformative” priors, a reasonable sample size will render differences in posteriors relatively minor.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>An improper prior does not integrate to one, and the integral may not even be finite. Oddly, this is sometimes ok.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>A binary predictor simply gives yes or no answers.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
