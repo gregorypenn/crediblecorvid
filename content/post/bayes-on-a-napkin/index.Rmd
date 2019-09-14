@@ -225,18 +225,18 @@ posteriors.df <- priors.df %>%
 ##### Influence of prior on posterior of sensitivity
 Our estimates of the probability P(A|S) are affected by our choice of prior, with *p* ranging from `r round(min(posteriors.df$p), 3)` to `r round(max(posteriors.df$p), 3)` and credible intervals varying over a similar range (see table below). The magnitude of the influence is largely a function of the ammount of new data we have. For sensitivity and precision, our sample space is constricted and only 17 of our 188 observations are relevant, so the proportion of prior weight in the posterior ranges from 0 to about 5.9%. For this particular analysis, the influence of prior is probably much less than that of other decisions, such as where to place geographic bounds on the sample data.
 
-```{r}
-ggplot(data_frame(x = 0:1), aes(x)) +
+```{r warning=FALSE}
+ggplot(tibble(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 0 + success, shape2 = 0 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Haldane")) +
+                aes(color = "Haldane")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/3 + success, shape2 = 1/3 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Neutral")) +
+                aes(color = "Neutral")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/2 + success, shape2 = 1/2 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Jeffreys")) +
+                aes(color = "Jeffreys")) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Uniform")) +
+                aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "probability", y = "density") +
+  labs(x = "Probability", y = "Density", color = "Prior") +
   ggtitle("Posterior P(A|S) with standard 'uninformative' priors") +
   theme_bw()
 ```
@@ -266,21 +266,21 @@ plot_beta(1/3 + success, 1/3 + failure)
 ##### Influence of prior on posterior of precision
 Identical to our analysis of the posterior of sensitivity.
 
-```{r}
+```{r warning=FALSE}
 priors.df <- data_frame(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
                         x = 0.5,
                         a = c(0, 1/3, 1/2, 1))
 ggplot(data_frame(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 0 + success, shape2 = 0 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Haldane")) +
+                aes(color = "Haldane")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/3 + success, shape2 = 1/3 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Neutral")) +
+                aes(color = "Neutral")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/2 + success, shape2 = 1/2 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Jeffreys")) +
+                aes(color = "Jeffreys")) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Uniform")) +
+                aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "probability", y = "density") +
+  labs(x = "Probability", y = "Density", color = "Prior") +
   ggtitle("Posterior P(S|A) with standard 'uninformative' priors") +
   theme_bw()
 
@@ -322,22 +322,22 @@ We see that the posterior distribution for accuracy is much narrower than that f
 ##### Influence of prior on posterior of accuracy
 Our posterior belief in the accuracy of A as a predictor of S is less affected by choice of prior than were sensitivity and precision. The reason for the difference is that the additional weight of evidence (188 cf 17 observations) overwhelmed the differences between priors.
 
-```{r}
+```{r warning=FALSE}
 priors.df <- data_frame(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
                         x = 0.5,
                         a = c(0, 1/3, 1/2, 1))
 ggplot(data_frame(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 0 + success, shape2 = 0 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Haldane")) +
+                aes(color = "Haldane")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/3 + success, shape2 = 1/3 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Neutral")) +
+                aes(color = "Neutral")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/2 + success, shape2 = 1/2 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Jeffreys")) +
+                aes(color = "Jeffreys")) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
-                aes(color = prior), data = filter(priors.df, prior == "Uniform")) +
+                aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
   ggtitle("Posterior P(A,S or !A,!S) with standard 'uninformative' priors") +
-  labs(x = "probability", y = "density") +
+  labs(x = "Probability", y = "Density", color = "Prior") +
   theme_bw()
 ```
 

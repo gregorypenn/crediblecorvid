@@ -205,16 +205,6 @@ S
 <div id="influence-of-prior-on-posterior-of-sensitivity" class="section level5">
 <h5>Influence of prior on posterior of sensitivity</h5>
 <p>Our estimates of the probability P(A|S) are affected by our choice of prior, with <em>p</em> ranging from 0.684 to 0.706 and credible intervals varying over a similar range (see table below). The magnitude of the influence is largely a function of the ammount of new data we have. For sensitivity and precision, our sample space is constricted and only 17 of our 188 observations are relevant, so the proportion of prior weight in the posterior ranges from 0 to about 5.9%. For this particular analysis, the influence of prior is probably much less than that of other decisions, such as where to place geographic bounds on the sample data.</p>
-<pre><code>## Warning: `data_frame()` is deprecated, use `tibble()`.
-## This warning is displayed once per session.</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
 <p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-10-1.png" width="75%" style="display: block; margin: auto;" /></p>
 For sensitivity P(A|S): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -369,14 +359,6 @@ S
 <div id="influence-of-prior-on-posterior-of-precision" class="section level5">
 <h5>Influence of prior on posterior of precision</h5>
 <p>Identical to our analysis of the posterior of sensitivity.</p>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
 <p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-13-1.png" width="75%" style="display: block; margin: auto;" /></p>
 For precision P(S|A): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -539,14 +521,6 @@ S
 <div id="influence-of-prior-on-posterior-of-accuracy" class="section level5">
 <h5>Influence of prior on posterior of accuracy</h5>
 <p>Our posterior belief in the accuracy of A as a predictor of S is less affected by choice of prior than were sensitivity and precision. The reason for the difference is that the additional weight of evidence (188 cf 17 observations) overwhelmed the differences between priors.</p>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `mapping` is not used by stat_function()</code></pre>
-<pre><code>## Warning: `data` is not used by stat_function()</code></pre>
 <p><img src="/post/bayes-on-a-napkin/index_files/figure-html/unnamed-chunk-16-1.png" width="75%" style="display: block; margin: auto;" /></p>
 For accuracy P(S,A) + P(!S,!A): priors, associated beta parameter <em>a</em>, point estimates for <em>p</em>, and lower and upper bounds of 95% credible intervals.
 <table class="table" style="margin-left: auto; margin-right: auto;">
