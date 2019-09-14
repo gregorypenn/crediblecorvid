@@ -62,7 +62,7 @@ plot_beta <- function(a1, a2, interval = 0.95,
   subtitle.str <- str_c(100*interval, "% ", "Credible interval: [",
                              round(lower, 3), ", ", round(upper, 3), "]",
                              sep = "")
-  plot <- ggplot(data.frame(x = c(0, 1)), aes(x)) +
+  plot <- ggplot(tibble(x = c(0, 1)), aes(x)) +
     geom_area(stat = "function", fun = dbeta, args = list(shape1 = a1, shape2 = a2),
               fill = "grey", alpha = 0.5, xlim = c(lower, upper)) +
     stat_function(fun = dbeta, args = list(shape1 = a1, shape2 = a2)) +
@@ -236,6 +236,7 @@ ggplot(tibble(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
                 aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
+  scale_color_brewer(type = "qual") +
   labs(x = "Probability", y = "Density", color = "Prior") +
   ggtitle("Posterior P(A|S) with standard 'uninformative' priors") +
   theme_bw()
@@ -267,10 +268,10 @@ plot_beta(1/3 + success, 1/3 + failure)
 Identical to our analysis of the posterior of sensitivity.
 
 ```{r warning=FALSE}
-priors.df <- data_frame(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
+priors.df <- tibble(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
                         x = 0.5,
                         a = c(0, 1/3, 1/2, 1))
-ggplot(data_frame(x = 0:1), aes(x)) +
+ggplot(tibble(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 0 + success, shape2 = 0 + failure),
                 aes(color = "Haldane")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/3 + success, shape2 = 1/3 + failure),
@@ -280,6 +281,7 @@ ggplot(data_frame(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
                 aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
+  scale_color_brewer(type = "qual") +
   labs(x = "Probability", y = "Density", color = "Prior") +
   ggtitle("Posterior P(S|A) with standard 'uninformative' priors") +
   theme_bw()
@@ -323,10 +325,10 @@ We see that the posterior distribution for accuracy is much narrower than that f
 Our posterior belief in the accuracy of A as a predictor of S is less affected by choice of prior than were sensitivity and precision. The reason for the difference is that the additional weight of evidence (188 cf 17 observations) overwhelmed the differences between priors.
 
 ```{r warning=FALSE}
-priors.df <- data_frame(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
+priors.df <- tibble(prior = ordered(c("Haldane", "Neutral", "Jeffreys", "Uniform")),
                         x = 0.5,
                         a = c(0, 1/3, 1/2, 1))
-ggplot(data_frame(x = 0:1), aes(x)) +
+ggplot(tibble(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 0 + success, shape2 = 0 + failure),
                 aes(color = "Haldane")) +
   stat_function(fun = dbeta, args = list(shape1 = 1/3 + success, shape2 = 1/3 + failure),
@@ -336,6 +338,7 @@ ggplot(data_frame(x = 0:1), aes(x)) +
   stat_function(fun = dbeta, args = list(shape1 = 1 + success, shape2 = 1 + failure),
                 aes(color = "Uniform")) +
   scale_y_continuous(limits = c(0, NA)) +
+  scale_color_brewer(type = "qual") +
   ggtitle("Posterior P(A,S or !A,!S) with standard 'uninformative' priors") +
   labs(x = "Probability", y = "Density", color = "Prior") +
   theme_bw()
