@@ -1,0 +1,59 @@
+gregorypenn
+Gregory Penn
+Southwest USA
+==================================================================
+https://keybase.io/gregorypenn
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://www.crediblecorvid.com
+  * I am gregorypenn (https://keybase.io/gregorypenn) on keybase.
+  * I have a public key ASDKEDA6Hd_4fmFWO92DyW9FjC9Z_c6feapHMuh0VLE4DAo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120ca10303a1ddff87e61563bdd83c96f458c2f59fdce9f79aa4732e87454b1380c0a",
+      "host": "keybase.io",
+      "kid": "0120ca10303a1ddff87e61563bdd83c96f458c2f59fdce9f79aa4732e87454b1380c0a",
+      "uid": "6e42fb34e36c8ca705034fdefbbca019",
+      "username": "gregorypenn"
+    },
+    "merkle_root": {
+      "ctime": 1568580549,
+      "hash": "7c4b8c2b375fed09413ae0ecf283e9d61f8f1d8f9c6cae55f13443a10bb83b5a9e6fc721da7954ed2486204fdfa36a719fd1c8e3a212a9511837b1cebfca6ec2",
+      "hash_meta": "05b15d4fb25a0e936199a15077bbae6fa23f118e06d263730c59292eb12709b8",
+      "seqno": 7417340
+    },
+    "service": {
+      "entropy": "6Q3G6BX8cJroPIFRXSKEZCo9",
+      "hostname": "www.crediblecorvid.com",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.4.2"
+  },
+  "ctime": 1568580563,
+  "expire_in": 504576000,
+  "prev": "a7afa70063a17d12e33aaef0249a95fe49748b082dfdeb51557e4d6264ac575a",
+  "seqno": 23,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgyhAwOh3f+H5hVjvdg8lvRYwvWf3On3mqRzLodFSxOAwKp3BheWxvYWTESpcCF8Qgp6+nAGOhfRLjOq7wJJqV/kl0iwgt/etRVX5NYmSsV1rEIGwAWUI/zu6StKbxvWqKK0s3bs1wet3eYDLkpud4AQeXAgHCo3NpZ8RAElo4VMMONjf76vR84rNpXixpOfKGS0ChNXKBpM9/Lw7+Olyr3YFlal7GKTbg8+aJ4Lngytyggfev7vi91Oo2AKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIL/tzAhT1eXpIkAsfyZnHLti4QucJqhHHaBtiQyp43loo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/gregorypenn
+
+==================================================================
