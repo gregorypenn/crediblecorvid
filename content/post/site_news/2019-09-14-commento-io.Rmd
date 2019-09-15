@@ -1,0 +1,20 @@
+---
+title: Commento.io
+author: Gregory Penn
+date: '2019-09-14'
+slug: commento-io
+categories: ["Site News"]
+tags: ["Site News", "Privacy"]
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2019-09-14T08:42:29-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+Want to chat about content on this site? I've implemented [Commento](https://www.commento.io), a privacy-focused comment platform.

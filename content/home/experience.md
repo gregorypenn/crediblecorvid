@@ -65,15 +65,6 @@ date_format = "Jan 2006"
   """
 
 [[experience]]
-  title = "Instructor"
-  company = "New Mexico State University"
-  company_url = "nmsu.edu"
-  location = "Las Cruces, New Mexico"
-  date_start = "2015-09-01"
-  date_end = "2016-05-01"
-  description = """Ecological Biometry with R and Population Ecology."""
-
-[[experience]]
   title = "Adjunct Instructor"
   company = "San Juan College, Biology & Horticulture Departments"
   company_url = "sjc.edu"
