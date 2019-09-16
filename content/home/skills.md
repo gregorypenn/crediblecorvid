@@ -48,13 +48,31 @@ subtitle = ""
   icon = "python"
   icon_pack = "fab"
   name = "Python"
-  description = "Rusty, but could pick it back up"
+  description = "Rusty, but would like to pick it back up."
 
 [[feature]]
   icon = "r-project"
   icon_pack = "fab"
   name = "R Shiny App"
   description = "Excited to learn!"
+
+[[feature]]
+  icon = "linux"
+  icon_pack = "fab"
+  name = "*nix"
+  description = "Experienced with Linux, NetBSD, MacOS."
+
+[[feature]]
+  icon = "terminal"
+  icon_pack = "fas"
+  name = "Terminal"
+  description = "Who needs a GUI?"
+
+[[feature]]
+  icon = "github"
+  icon_pack = "fab"
+  name = "Version Control"
+  description = "Git or Mercurial? Just pick one and let's get to work!"
 
 [[feature]]
   icon = "camera-retro"
