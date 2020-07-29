@@ -14,7 +14,7 @@ projects:
 - internal-project
 publishDate: "2020-07-28T00:00:00Z"
 summary: A short talk at ESA 2020 about species distribution modeling with presence-only data.
-tags: []
+tags: ["presence-only data", "species distribution modeling", "methods"]
 title: When is it possible to infer species abundance from presence-only data?
 url_code: ""
 url_pdf: ""
