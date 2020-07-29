@@ -1,10 +1,10 @@
 ---
 share: false
 abstract: Presence-only data in ecology is the product of joint processes of species occurrance and human observation. Modeling these processes directly enables estimation of species abundance or probability of occurrance in absolute terms without prior knowledge of prevalance. This approach is validated with simulated data and applied to a community-science dataset.
-all_day: false
+all_day: true
 authors: [Gregory Penn, Brook Milligan]
-date: "2020-08-03T08:00:00Z"
-date_end: "2020-08-06T15:00:00Z"
+date: "2020-08-03"
+date_end: "2020-08-06"
 event: Ecological Society of America 2020
 event_url: https://www.esa.org/saltlake/
 featured: true
