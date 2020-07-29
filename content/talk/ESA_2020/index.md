@@ -12,7 +12,7 @@ location: Virtual meeting. COVID-19 pandemic safe!
 math: true
 projects:
 - internal-project
-publishDate: "2020-08-03T00:00:00Z"
+# publishDate: "2020-08-03T00:00:00Z"
 summary: A short talk at ESA 2020 about species distribution modeling with presence-only data.
 tags: []
 title: When is it possible to infer species abundance from presence-only data?
