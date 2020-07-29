@@ -22,6 +22,6 @@ url_slides: ""
 url_video: ""
 ---
 
-{{< vimeo 442566667 >}}
+{{< vimeo id="442566667" style="border:2px solid black;" >}}
 
 Let me know if you'd like me to put the slides up here. I'm not sure they'd be useful without the accompanying talk.
