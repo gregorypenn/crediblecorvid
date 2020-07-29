@@ -7,7 +7,7 @@ date: "2020-08-03"
 date_end: "2020-08-06"
 event: Ecological Society of America 2020
 event_url: https://www.esa.org/saltlake/
-featured: true
+featured: false
 location: Virtual meeting. COVID-19 pandemic safe!
 math: true
 projects:
