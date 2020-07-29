@@ -5,6 +5,7 @@ public/
 ignore/
 .Rproj.user
 .ignore
+*.ignore
 
 # Local Netlify folder
 .netlify
