@@ -1,6 +1,6 @@
 ---
 share: false
-abstract: Presence-only data in ecology is the product of joint processes of species occurrance and human observation. Modeling these processes directly enables estimation of species abundance or probability of occurrance in absolute terms without prior knowledge of prevalance. This approach is validated with simulated data and applied to a community-science dataset.
+abstract: Presence-only data in ecology is the product of joint processes of species occurrance and human observation. Modeling these processes directly enables estimation of species abundance, or probability of occurrance, in absolute terms without prior knowledge of prevalance. The method is validated with simulated data and applied to a community-science dataset.
 all_day: true
 authors: [Gregory Penn, Brook Milligan]
 date: "2020-08-03"
@@ -14,7 +14,7 @@ projects:
 - internal-project
 publishDate: "2020-07-28T00:00:00Z"
 summary: A short talk at ESA 2020 about species distribution modeling with presence-only data.
-tags: []
+tags: ["presence-only data", "species distribution modeling", "methods"]
 title: When is it possible to infer species abundance from presence-only data?
 url_code: ""
 url_pdf: ""

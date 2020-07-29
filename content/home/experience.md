@@ -39,6 +39,18 @@ date_format = "Jan 2006"
   """
 
 [[experience]]
+  title = "Graduate Assistant"
+  company = "Jornada Experimental Range"
+  company_url = "https://jornada.nmsu.edu/ "
+  location = "Las Cruces, New Mexico"
+  date_start = "2019-11-01"
+  date_end = "2020-02-27"
+  description = """
+  * Developed R package for data reporting
+  * Data visualization
+  """
+
+[[experience]]
   title = "Research & Teaching Assistant"
   company = "New Mexico State University, Biology Department"
   company_url = "nmsu.edu"
