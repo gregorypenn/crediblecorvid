@@ -40,5 +40,5 @@ title = "Credible Corvid"
   label = 'I am currently looking for a position.'
 +++
 
-**Collecting valuable, interesting, and shiny things**
+**Statistical ecology, natural history, data science**
 
