@@ -200,7 +200,7 @@ pre code {
 
 <h1 class="title toc-ignore">Analytical Solution to Binomial Presence-Only Data Model</h1>
 <h4 class="author">Gregory Penn</h4>
-<h4 class="date">03 November, 2021</h4>
+<h4 class="date">05 November, 2021</h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 Species distribution modeling with presence-only or presence-background data requires additional information in order to estimate abundance in absolute terms, e.g. population density or probability of occurrence. Current methods generally require that this information be prior knowledge of species prevalence (i.e. unconditional species abundance), which is often unknown. However, while the requirement of additional information is not flexible, the source of that information is; it need not be species prevalence. We illustrate this with a model of presence-only data as the result of joint latent processes of species occurrence and human observation. We show that our model can estimate species abundance absolutely from presence-only data if parameters of the observation process are known or can be estimated.
@@ -231,8 +231,8 @@ p_{\text{detect}} = 1 - e^{-p_1 \xi a}
 \tag{2.1}
 \end{equation}\]</span></p>
 <p>Any bounded region of the landscape will contain a number <span class="math inline">\(z\)</span> of presence-only records (i.e., detections) resulting from <span class="math inline">\(n\)</span> independent observation events, each with detection probability <span class="math inline">\(p_\text{detect}\)</span>. Thus <span class="math inline">\(z\)</span> has a binomial probability distribution, with probability mass function</p>
-<p><span class="math display" id="eq:pmf1">\[\begin{equation}
-z \sim \binom{n}{z} \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}
+<p><span class="math display" id="eq:pmfz">\[\begin{equation}
+\Pr(z \mid \xi, p_1) = \binom{n}{z} \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}
 \tag{2.2}
 \end{equation}\]</span></p>
 <p>The likelihood function for <span class="math inline">\(\xi\)</span> is</p>
@@ -368,63 +368,101 @@ Probability of a single observable occurrance triggering detection
 </table>
 <div id="bayesmodel" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Bayesian model</h2>
-<p><strong>NOTE:</strong> All the math in Section <a href="#bayesmodel">2.1</a> needs to be checked.</p>
-<div id="accounting-for-uncertainty-in-p_1" class="section level3" number="2.1.1">
-<h3><span class="header-section-number">2.1.1</span> Accounting for uncertainty in <span class="math inline">\(p_1\)</span></h3>
-<p>The distribution of <span class="math inline">\(z\)</span> in equation <a href="#eq:pmf1">(2.2)</a> and the corresponding likelihood of <span class="math inline">\(\xi\)</span> in equation <a href="#eq:lxi1">(2.3)</a> are for a given value of <span class="math inline">\(p_1\)</span>. To account for uncertainty in <span class="math inline">\(p_1\)</span> we consider the joint distribution of <span class="math inline">\(z\)</span> and <span class="math inline">\(p_1\)</span>. We model <span class="math inline">\(p_1\)</span> as a beta distributed random variable with shape parameters <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> and probability density function</p>
-<p><span class="math display" id="eq:p1prior">\[\begin{equation}
-\Pr(p_1) = p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)}
-\tag{2.4}
-\end{equation}\]</span></p>
-<p>where <span class="math inline">\(\Gamma\)</span> is the gamma function <span class="math inline">\(\Gamma(x) = (x - 1)!\)</span>. So the marginal distribution of <span class="math inline">\(z\)</span> is</p>
-<p><span class="math display" id="eq:pmf2">\[\begin{align}
-z &amp;\sim \int_{p_1 = 0}^{1} \Pr(z \mid p_1) \Pr(p_1) \, dp_1 \\
-&amp;\sim \int_{p_1 = 0}^{1} \binom{n}{z} \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}
-  p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} \, dp_1
-\tag{2.5}
-\end{align}\]</span></p>
-</div>
-<div id="accounting-for-uncertainty-in-xi" class="section level3" number="2.1.2">
-<h3><span class="header-section-number">2.1.2</span> Accounting for uncertainty in <span class="math inline">\(\xi\)</span></h3>
-<p>We model <span class="math inline">\(\xi\)</span> as a gamma distributed random variable with shape parameter <span class="math inline">\(\eta\)</span>, rate parameter <span class="math inline">\(\tau\)</span>, and probability density function</p>
+<p><strong>NOTE:</strong> All the math in Section <a href="#bayesmodel">2.1</a> needs to be checked. To keep the notation legible, we ignore fixed parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(n\)</span> initially, re-introducing them when details require.</p>
+<div id="priors" class="section level3" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Priors</h3>
+<p>For <span class="math inline">\(\xi\)</span> we use a gamma prior distribution with shape parameter <span class="math inline">\(\eta\)</span>, rate parameter <span class="math inline">\(\tau\)</span>, and probability density function</p>
 <p><span class="math display" id="eq:xiprior">\[\begin{equation}
 \Pr(\xi) = \frac{\eta^\tau}{\Gamma(\eta)} \xi^{\eta - 1} e^{-\tau \xi}
+\tag{2.4}
+\end{equation}\]</span></p>
+<p>For <span class="math inline">\(p_1\)</span> we use a beta prior distribution with shape parameters <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> and probability density function</p>
+<p><span class="math display" id="eq:p1prior">\[\begin{equation}
+\Pr(p_1) = p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)}
+\tag{2.5}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Gamma\)</span> is the gamma function <span class="math inline">\(\Gamma(x) = (x - 1)!\)</span>. Because <span class="math inline">\(p_1\)</span> and <span class="math inline">\(\xi\)</span> are independent, their joint prior is</p>
+<p><span class="math display" id="eq:xip1jointprior">\[\begin{equation}
+\Pr(\xi, p_1) =
+\left[\frac{\eta^\tau}{\Gamma(\eta)} \xi^{\eta - 1} e^{-\tau \xi} \right]
+\cdot \left[p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)}\right]
 \tag{2.6}
 \end{equation}\]</span></p>
-<p>Following the same reasoning applied to <span class="math inline">\(p_1\)</span> results in a marginal distribution of <span class="math inline">\(z\)</span> across <span class="math inline">\(\xi\)</span> and <span class="math inline">\(p_1\)</span> of</p>
-<p><span class="math display" id="eq:pmf3">\[\begin{align}
-z &amp;\sim \int_{\xi = 0}^{\infty}\int_{p_1 = 0}^{1} \Pr(z \mid p_1, \xi) \Pr(p_1 \mid \xi) \Pr(\xi) \, dp_1 \, d\xi \\
-&amp;\sim \int_{\xi = 0}^{\infty}\int_{p_1 = 0}^{1} 
-  \left[\binom{n}{z} \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}\right]
-  \left[p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)}\right]
-  \left[\frac{\eta^\tau}{\Gamma(\eta)} \xi^{\eta - 1} e^{-\tau \xi}\right]
-  \, dp_1 \, d\xi \\
-&amp;= \mathcal{L}_z(\xi)
-\tag{2.7}
-\end{align}\]</span></p>
-<p>where <span class="math inline">\(\mathcal{L}_z(\xi)\)</span> is the likelihood of <span class="math inline">\(\xi\)</span> given <span class="math inline">\(z\)</span>.</p>
 </div>
-<div id="posterior-distribution" class="section level3" number="2.1.3">
-<h3><span class="header-section-number">2.1.3</span> Posterior Distribution</h3>
-<p>After some algebra, <a href="#eq:pmf3">(2.7)</a> yields</p>
+<div id="marginal-posterior-of-xi" class="section level3" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Marginal posterior of <span class="math inline">\(\xi\)</span></h3>
+<p>The posterior joint distribution of <span class="math inline">\(\xi\)</span> and <span class="math inline">\(p_1\)</span> is</p>
+<p><span class="math display" id="eq:jointposterior">\[\begin{equation}
+\Pr(\xi, p_1 \mid z) = c \cdot \Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1)
+\tag{2.7}
+\end{equation}\]</span></p>
+<p>with the normalizing constant</p>
 <p><span class="math display">\[\begin{equation}
-\mathcal{L}(\xi) = -{n \choose z}  
-\frac{\tau^{\eta} \,\Gamma\left(\alpha + \beta\right)}
-  {\Gamma\left(\alpha\right) \Gamma\left(\beta\right) \Gamma\left(\eta\right)}
-\int_{\xi = 0}^{\infty}
-  \xi^{\eta - 1} 
-  \int_{p_1 = 0}^{1}
-    \frac{p_{1}^{\alpha - 1} {\left(-p_{1} + 1\right)}^{\beta}}{p_1 - 1}
-    {\left(-e^{\left(a p_{1} \xi\right)} + 1\right)}^{z} e^{\left(a n p_{1} \xi - a p_{1} \xi z - \tau \xi\right)}
+c = \frac{1}{\int_{\xi = 0}^{\infty} \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1) \, d p_1 \, d \xi}
+\end{equation}\]</span></p>
+<p>The marginal distribution of <span class="math inline">\(\xi\)</span> given <span class="math inline">\(z\)</span> integrates the joint posterior <a href="#eq:jointposterior">(2.7)</a> across the distribution of <span class="math inline">\(p_1\)</span>.</p>
+<p><span class="math display" id="eq:marginalxi">\[\begin{equation}
+\Pr(\xi \mid z) = c \cdot \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1) \, d p_1
+\tag{2.8}
+\end{equation}\]</span></p>
+<p>To make the integrals more comprehensible, we re-factor the gory details as</p>
+<p><span class="math display" id="eq:refactor">\[\begin{align}
+\Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1) &amp;=
+  \overbrace{
+    \binom{n}{z} \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}
+  }^{\Pr(z \mid \xi, p_1)}
+    \cdot \overbrace{
+      \left[\frac{\eta^\tau}{\Gamma(\eta)} \cdot \xi^{\eta - 1} e^{-\tau \xi} \right]
+    }^{\Pr(\xi)}
+    \cdot \overbrace{
+      \left[p_1^{\alpha - 1} (1 - p_1)^{\beta - 1}
+      \cdot \frac{\Gamma(\alpha + \beta)}
+      {\Gamma(\alpha) \cdot \Gamma(\beta)}\right]
+    }^{\Pr(p_1)} \\
+&amp;= f(\theta) \cdot g(\theta_\xi) \cdot h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
+\tag{2.9}
+\end{align}\]</span></p>
+<p>Where</p>
+<p><span class="math display">\[\begin{align}
+f(\theta)
+&amp;= \binom{n}{z} \cdot \frac{\eta^\tau}{\Gamma(\eta)}
+    \cdot \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)} \quad \text{with}~ 
+    &amp;&amp;\theta = \{n, z, \eta, \tau, \alpha, \beta\} \\
+  g(\theta_\xi) &amp;= \xi^{\eta - 1} e^{-\tau \xi} 
+    &amp;&amp;\theta_\xi = \{\xi, \eta, \tau\} \\
+  h(\theta_{p_1}) &amp;= p_1^{\alpha - 1} (1 - p_1)^{\beta - 1} \quad
+    &amp;&amp;\theta_{p_1} = \{p_1, \alpha, \beta\} \\
+  k(\theta_{\xi, p_1}) &amp;= \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)} \quad
+    &amp;&amp;\theta_{\xi, p_1} = \{p_1, \xi, a, n, z\}
+\end{align}\]</span></p>
+<p>Substituting <span class="math inline">\(f(\theta) \cdot g(\theta_\xi) \cdot h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})\)</span> from <a href="#eq:refactor">(2.9)</a> into the marginal distribution of <span class="math inline">\(\xi\)</span> from <a href="#eq:marginalxi">(2.8)</a> yields</p>
+<p><span class="math display" id="eq:marginalxihairy">\[\begin{align}
+\Pr(\xi \mid z)
+&amp;= c&#39; \cdot g(\theta_\xi) 
+  \cdot \int_{p_1 = 0}^{1}
+      h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
   \, d p_1
-\, d \xi
-\end{equation}\]</span></p>
-<p>The posterior distribution of <span class="math inline">\(\xi\)</span> is</p>
+\tag{2.10}
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(c&#39;\)</span> is</p>
 <p><span class="math display">\[\begin{equation}
-\mathrm{P}(\xi) = 
-\frac{\mathcal{L}_z(\xi) \Pr(\xi)}
-  {\int_{\xi = 0}^{\infty}\mathcal{L}_z(\xi) * \Pr(\xi)\,d\xi}
+c&#39; = \frac{1}{\int_{\xi = 0}^{\infty} g(\theta_\xi) 
+  \cdot \int_{p_1 = 0}^{1} h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1}) \, d p_1 \, d \xi}
 \end{equation}\]</span></p>
+<p>Note that <span class="math inline">\(f(\theta)\)</span> cancels out of the equation.</p>
+</div>
+<div id="marginal-moments-of-xi" class="section level3" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Marginal Moments of <span class="math inline">\(\xi\)</span></h3>
+<p>The <span class="math inline">\(n\)</span>th moment around the origin of <span class="math inline">\(\xi\)</span> is</p>
+<p><span class="math display" id="eq:ximoments">\[\begin{align}
+\mathrm{E}(\xi \mid z) 
+&amp;= \int_{xi = 0}^{\infty} \xi^n \cdot \Pr(\xi \mid z) \, d \xi \\
+&amp;= c&#39; \cdot \int_{xi = 0}^{\infty} 
+  \xi^n \cdot g(\theta_\xi) \cdot \int_{p_1 = 0}^{1}
+      h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
+  \, d p_1 \, d \xi
+\tag{2.11}
+\end{align}\]</span></p>
 <!-- TO DO: Solving the expressions in this section requires math that is currently beyond me. -->
 <!-- The posterior distribution of $\xi$ is the normalized product of the prior and the likelihood. -->
 <!-- \begin{equation} -->
