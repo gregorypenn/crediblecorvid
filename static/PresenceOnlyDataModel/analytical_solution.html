@@ -200,7 +200,7 @@ pre code {
 
 <h1 class="title toc-ignore">Analytical Solution to Binomial Presence-Only Data Model</h1>
 <h4 class="author">Gregory Penn</h4>
-<h4 class="date">05 November, 2021</h4>
+<h4 class="date">09 November, 2021</h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 Species distribution modeling with presence-only or presence-background data requires additional information in order to estimate abundance in absolute terms, e.g. population density or probability of occurrence. Current methods generally require that this information be prior knowledge of species prevalence (i.e. unconditional species abundance), which is often unknown. However, while the requirement of additional information is not flexible, the source of that information is; it need not be species prevalence. We illustrate this with a model of presence-only data as the result of joint latent processes of species occurrence and human observation. We show that our model can estimate species abundance absolutely from presence-only data if parameters of the observation process are known or can be estimated.
@@ -368,7 +368,7 @@ Probability of a single observable occurrance triggering detection
 </table>
 <div id="bayesmodel" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Bayesian model</h2>
-<p><strong>NOTE:</strong> All the math in Section <a href="#bayesmodel">2.1</a> needs to be checked. To keep the notation legible, we ignore fixed parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(n\)</span> initially, re-introducing them when details require.</p>
+<p><strong>NOTES:</strong> All the math in Section <a href="#bayesmodel">2.1</a> needs to be checked. For now, we consider sampling effort (i.e. binomial trials) <span class="math inline">\(n\)</span> to be a known constant, though the model should be generalized with <span class="math inline">\(n\)</span> as a random variable. The number of binomial successes <span class="math inline">\(z\)</span> is modeled as a random variable, however this quantity is generally fixed as data. To keep the notation legible, we ignore fixed parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(n\)</span> initially, re-introducing them when details require.</p>
 <div id="priors" class="section level3" number="2.1.1">
 <h3><span class="header-section-number">2.1.1</span> Priors</h3>
 <p>For <span class="math inline">\(\xi\)</span> we use a gamma prior distribution with shape parameter <span class="math inline">\(\eta\)</span>, rate parameter <span class="math inline">\(\tau\)</span>, and probability density function</p>
@@ -405,6 +405,7 @@ c = \frac{1}{\int_{\xi = 0}^{\infty} \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cd
 \Pr(\xi \mid z) = c \cdot \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1) \, d p_1
 \tag{2.8}
 \end{equation}\]</span></p>
+<p><strong>Note:</strong> The generalization to model <span class="math inline">\(n\)</span> as a random variable would introduce another integral here across <span class="math inline">\(n\)</span>. Informative priors may adequately constrain the general model, but that remains to be verified.</p>
 <p>To make the integrals more comprehensible, we re-factor the gory details as</p>
 <p><span class="math display" id="eq:refactor">\[\begin{align}
 \Pr(z \mid \xi, p_1) \cdot \Pr(xi, p_1) &amp;=
@@ -423,7 +424,7 @@ c = \frac{1}{\int_{\xi = 0}^{\infty} \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cd
 \tag{2.9}
 \end{align}\]</span></p>
 <p>Where</p>
-<p><span class="math display">\[\begin{align}
+<p><span class="math display" id="eq:thetas">\[\begin{align}
 f(\theta)
 &amp;= \binom{n}{z} \cdot \frac{\eta^\tau}{\Gamma(\eta)}
     \cdot \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)} \quad \text{with}~ 
@@ -434,6 +435,7 @@ f(\theta)
     &amp;&amp;\theta_{p_1} = \{p_1, \alpha, \beta\} \\
   k(\theta_{\xi, p_1}) &amp;= \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)} \quad
     &amp;&amp;\theta_{\xi, p_1} = \{p_1, \xi, a, n, z\}
+\tag{2.10}
 \end{align}\]</span></p>
 <p>Substituting <span class="math inline">\(f(\theta) \cdot g(\theta_\xi) \cdot h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})\)</span> from <a href="#eq:refactor">(2.9)</a> into the marginal distribution of <span class="math inline">\(\xi\)</span> from <a href="#eq:marginalxi">(2.8)</a> yields</p>
 <p><span class="math display" id="eq:marginalxihairy">\[\begin{align}
@@ -442,27 +444,94 @@ f(\theta)
   \cdot \int_{p_1 = 0}^{1}
       h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
   \, d p_1
-\tag{2.10}
+\tag{2.11}
 \end{align}\]</span></p>
 <p>where <span class="math inline">\(c&#39;\)</span> is</p>
-<p><span class="math display">\[\begin{equation}
+<p><span class="math display" id="eq:cprime">\[\begin{equation}
 c&#39; = \frac{1}{\int_{\xi = 0}^{\infty} g(\theta_\xi) 
   \cdot \int_{p_1 = 0}^{1} h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1}) \, d p_1 \, d \xi}
+\tag{2.12}
 \end{equation}\]</span></p>
 <p>Note that <span class="math inline">\(f(\theta)\)</span> cancels out of the equation.</p>
 </div>
 <div id="marginal-moments-of-xi" class="section level3" number="2.1.3">
 <h3><span class="header-section-number">2.1.3</span> Marginal Moments of <span class="math inline">\(\xi\)</span></h3>
-<p>The <span class="math inline">\(n\)</span>th moment around the origin of <span class="math inline">\(\xi\)</span> is</p>
+<p>The <span class="math inline">\(j\)</span>th moment around the origin of <span class="math inline">\(\xi\)</span> is</p>
 <p><span class="math display" id="eq:ximoments">\[\begin{align}
 \mathrm{E}(\xi \mid z) 
 &amp;= \int_{xi = 0}^{\infty} \xi^n \cdot \Pr(\xi \mid z) \, d \xi \\
 &amp;= c&#39; \cdot \int_{xi = 0}^{\infty} 
-  \xi^n \cdot g(\theta_\xi) \cdot \int_{p_1 = 0}^{1}
+  \xi^j \cdot g(\theta_\xi) \cdot \int_{p_1 = 0}^{1}
       h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
   \, d p_1 \, d \xi
-\tag{2.11}
+\tag{2.13}
 \end{align}\]</span></p>
+</div>
+<div id="integration" class="section level3" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> Integration</h3>
+<p>We begin with the integral</p>
+<p><span class="math display">\[\begin{equation}
+\int_{p_1 = 0}^{1}
+      h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
+  \, d p_1
+= \int_{p_1 = 0}^{1}
+p_1^{\alpha - 1} (1 - p_1)^{\beta - 1} 
+  \cdot \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)}
+  \, d p_1
+\end{equation}\]</span></p>
+<div id="special-case-1-z-1-n---z-1-a-1-p_1-sim-mathrmbeta1-1" class="section level4" number="2.1.4.1">
+<h4><span class="header-section-number">2.1.4.1</span> Special case 1: <span class="math inline">\(z =1\)</span>, <span class="math inline">\(n - z = 1\)</span>, <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(p_1 \sim \mathrm{Beta(1, 1)}\)</span></h4>
+<p>Convenient priors and fixed constants allow simplification of a special case. Assume <span class="math inline">\(z = 1\)</span>, <span class="math inline">\(n - z = 1\)</span>, <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(p_1 \sim \mathrm{Beta(1, 1)}\)</span>, and <span class="math inline">\(\xi \sim \mathrm{Gamma}(\eta = 1, \tau = 1)\)</span>.</p>
+<p>The Bayes-Laplace uniform prior <span class="math inline">\(p_1 \sim \mathrm{Beta}(\alpha = 1, \beta = 1)\)</span> simplifies</p>
+<p><span class="math display" id="eq:h-sc1">\[\begin{equation}
+h(\theta_{p_1}) = p_1^{\alpha - 1} (1 - p_1)^{\beta - 1} \rightarrow 1
+\tag{2.14}
+\end{equation}\]</span></p>
+<p>Fixing <span class="math inline">\(n = n - z = 1\)</span> and <span class="math inline">\(a = 1\)</span> simplifies</p>
+<p><span class="math display" id="eq:k-sc1">\[\begin{equation}
+k(\theta_{\xi, p_1}) = \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\right)^{(n - z)} 
+  \rightarrow \left(1 - e^{-p_1 \xi}\right) e^{-p_1 \xi}
+\tag{2.15}
+\end{equation}\]</span></p>
+<p>The weakly informative prior <span class="math inline">\(\xi \sim \mathrm{Gamma}(\eta = 1, \tau = 1)\)</span> simplifies</p>
+<p><span class="math display" id="eq:g-sc1">\[\begin{equation}
+g(\theta_{\xi}) = \xi^{\eta - 1} e^{-\tau \xi} \rightarrow e^{-\xi}
+\tag{2.16}
+\end{equation}\]</span></p>
+<p>So the inner integral from <a href="#eq:ximoments">(2.13)</a> becomes</p>
+<p><span class="math display" id="eq:sc1">\[\begin{equation}
+\int_{p_1 = 0}^{1}
+      h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
+  \, d p_1
+= \int_{p_1 = 0}^{1}
+  \left(1 - e^{-p_1 \xi}\right) e^{-p_1 \xi}
+  \, d p_1
+\tag{2.17}
+\end{equation}\]</span></p>
+<p>Evaluating <a href="#eq:sc1">(2.17)</a> in SageMath (code in Appendix <a href="#sage-sc1">D.1</a>) returns</p>
+<p><span class="math display" id="eq:sc1-innerint">\[\begin{equation}
+\int_{p_1 = 0}^{1}
+  \left(1 - e^{-p_1 \xi}\right) \left(e^{-p_1 \xi}\right)
+  \, d p_1
+= \frac{{\left(e^{\left(2 \, \xi\right)} - 2 \, e^{\xi} + 1\right)} e^{\left(-2 \, \xi\right)}}
+  {2 \, \xi}
+\tag{2.18}
+\end{equation}\]</span></p>
+<p>for the first moment of <span class="math inline">\(\xi\)</span>, i.e. <span class="math inline">\(j = 1\)</span>, this leads to the outer integral from <a href="#eq:ximoments">(2.13)</a></p>
+<p><span class="math display" id="eq:sc1-outerint">\[\begin{equation}
+\int_{xi = 0}^{\infty} 
+  \xi^1 e^{-\xi} \cdot 
+    \frac{{\left(e^{\left(2 \, \xi\right)} - 2 \, e^{\xi} + 1\right)} e^{\left(-2 \, \xi\right)}}
+      {2 \, \xi}
+  \, d \xi
+\tag{2.19}
+\end{equation}\]</span></p>
+<p>which evaluates in SageMath to <span class="math inline">\(\frac{1}{6}\)</span>. The normalizing constant <span class="math inline">\(c&#39;\)</span> from <a href="#eq:cprime">(2.12)</a> evaluates to <span class="math inline">\(-\frac{1}{3 \, {\left(\log\left(3\right) - 2 \, \log\left(2\right)\right)}}\)</span>. Thus the expectation of <span class="math inline">\(\xi\)</span> is</p>
+<p><span class="math display">\[\begin{equation}
+\mathrm{E}(\xi) = -\frac{1}{3 \, {\left(\log\left(3\right) - 2 \, \log\left(2\right)\right)}}
+\approx 1.1587
+\end{equation}\]</span></p>
+<p>The maximum likelihood value of <span class="math inline">\(\xi\)</span> under this parameterization is 1.3863. The difference between the ML value and the Bayesian expectation is relatively small, and may be attributable to the prior for <span class="math inline">\(\xi\)</span>, which has expectation <span class="math inline">\(\mathrm{E}(\xi) = 1\)</span> and carries a bit more weight than some typically “uninformative” priors, i.e. <span class="math inline">\(\mathrm{Gamma}(0.0001, 0.0001)\)</span>.</p>
 <!-- TO DO: Solving the expressions in this section requires math that is currently beyond me. -->
 <!-- The posterior distribution of $\xi$ is the normalized product of the prior and the likelihood. -->
 <!-- \begin{equation} -->
@@ -493,6 +562,7 @@ c&#39; = \frac{1}{\int_{\xi = 0}^{\infty} g(\theta_\xi)
 <!-- \begin{equation} -->
 <!-- E(\xi^2) - [E(\xi)]^2 -->
 <!-- \end{equation} -->
+</div>
 </div>
 </div>
 </div>
@@ -665,6 +735,34 @@ dif</code></pre>
 <pre class="r"><code># ml_xi2(n, expected_z, p1, r)
 # ml_xi3(n, expected_z, p1, r)</code></pre>
 <p>The difference between the expected value of <span class="math inline">\(\xi = 100\)</span> and the maximum likelihood value is -2.8421709^{-14}. The difference is very small, so likely the result of rounding error, and so passes the sanity check. I could do something more thorough, like generating a bunch of random values and doing a regression, but I think the ML derivation and sanity check are sufficient at least for now.</p>
+</div>
+<div id="sagemath" class="section level1" number="7">
+<h1><span class="header-section-number">D</span> SageMath</h1>
+<div id="sage-sc1" class="section level2" number="7.1">
+<h2><span class="header-section-number">D.1</span> Special case 1:</h2>
+<p>SageMath version 9.4</p>
+<pre class="python"><code>from sage.symbolic.integration.integral import definite_integral
+
+# Special case 1: alpha = beta = 1, z = n - z = 1, a = 1
+xi = var(&#39;xi&#39;); assume(xi &gt;= 0)
+p1 = var(&#39;p1&#39;); assume(p1 &gt;= 0); assume(p1 &lt;=1)
+
+g(xi, tau) = exp(-xi)
+k(p1, xi) = (1 - exp(-p1 * xi)) * exp(-p1 * xi)
+
+dp1 = definite_integral(SR(k), p1, 0, 1)
+print(latex(dp1))
+
+dxi = definite_integral(SR(xi * g * dp1), xi, 0, oo)
+print(latex(dxi))
+
+cprime = 1 / definite_integral(SR(g * dp1), xi, 0, oo)
+print(latex(cprime))
+
+expect_xi = cprime * dxi
+print(latex(expect_xi))
+print(round(expect_xi, 4))```</code></pre>
+</div>
 </div>
 
 
