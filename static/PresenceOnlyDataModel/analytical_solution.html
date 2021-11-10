@@ -200,7 +200,7 @@ pre code {
 
 <h1 class="title toc-ignore">Analytical Solution to Binomial Presence-Only Data Model</h1>
 <h4 class="author">Gregory Penn</h4>
-<h4 class="date">09 November, 2021</h4>
+<h4 class="date">10 November, 2021</h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 Species distribution modeling with presence-only or presence-background data requires additional information in order to estimate abundance in absolute terms, e.g. population density or probability of occurrence. Current methods generally require that this information be prior knowledge of species prevalence (i.e. unconditional species abundance), which is often unknown. However, while the requirement of additional information is not flexible, the source of that information is; it need not be species prevalence. We illustrate this with a model of presence-only data as the result of joint latent processes of species occurrence and human observation. We show that our model can estimate species abundance absolutely from presence-only data if parameters of the observation process are known or can be estimated.
@@ -427,7 +427,7 @@ c = \frac{1}{\int_{\xi = 0}^{\infty} \int_{p_1 = 0}^{1} \Pr(z \mid \xi, p_1) \cd
 <p><span class="math display" id="eq:thetas">\[\begin{align}
 f(\theta)
 &amp;= \binom{n}{z} \cdot \frac{\eta^\tau}{\Gamma(\eta)}
-    \cdot \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)} \quad \text{with}~ 
+    \cdot \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \cdot \Gamma(\beta)} \qquad\qquad\qquad \text{with} 
     &amp;&amp;\theta = \{n, z, \eta, \tau, \alpha, \beta\} \\
   g(\theta_\xi) &amp;= \xi^{\eta - 1} e^{-\tau \xi} 
     &amp;&amp;\theta_\xi = \{\xi, \eta, \tau\} \\
@@ -467,9 +467,13 @@ c&#39; = \frac{1}{\int_{\xi = 0}^{\infty} g(\theta_\xi)
 \tag{2.13}
 \end{align}\]</span></p>
 </div>
-<div id="special-case-1-z-1-n---z-1-a-1-p_1-sim-mathrmbeta1-1" class="section level3" number="2.1.4">
-<h3><span class="header-section-number">2.1.4</span> Special case 1: <span class="math inline">\(z =1\)</span>, <span class="math inline">\(n - z = 1\)</span>, <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(p_1 \sim \mathrm{Beta(1, 1)}\)</span></h3>
-<p>Convenient priors and fixed constants allow simplification of a special case. Assume <span class="math inline">\(z = 1\)</span>, <span class="math inline">\(n - z = 1\)</span>, <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(p_1 \sim \mathrm{Beta(1, 1)}\)</span>, and <span class="math inline">\(\xi \sim \mathrm{Gamma}(\eta = 1, \tau = 1)\)</span>.</p>
+</div>
+<div id="analytical-solution-to-bayesian-model" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Analytical Solution to Bayesian Model</h2>
+<p><strong>Status:</strong> I think there is no general solution, at least with a gamma prior for <span class="math inline">\(\xi\)</span> and a beta prior for <span class="math inline">\(p_1\)</span>. There is at least one special case in this form that can be solved, which is described in the following section. If there are more, then it would be good to describe them as a family with certain parameter constraints. It might be worth trying priors that are less complicated to integrate, something without power functions. Another approach would be to resort to numerical approximation of the integrals, which could be implemented in R to promote more widespread adoption of the method.</p>
+<div id="special-case-1" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Special case 1</h3>
+<p>Convenient priors and fixed constants allow simplification of a special case. Assume <span class="math inline">\(z = 1\)</span>, <span class="math inline">\(n - z = 1\)</span>, <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(p_1 \sim \mathrm{Beta(\alpha = 1, \beta = 1)}\)</span>, and <span class="math inline">\(\xi \sim \mathrm{Gamma}(\eta = 1, \tau = 1)\)</span>.</p>
 <p>The Bayes-Laplace uniform prior <span class="math inline">\(p_1 \sim \mathrm{Beta}(\alpha = 1, \beta = 1)\)</span> simplifies</p>
 <p><span class="math display" id="eq:h-sc1">\[\begin{equation}
 h(\theta_{p_1}) = p_1^{\alpha - 1} (1 - p_1)^{\beta - 1} \rightarrow 1
@@ -486,69 +490,61 @@ k(\theta_{\xi, p_1}) = \left(1 - e^{-p_1 \xi a}\right)^{z} \left(e^{-p_1 \xi a}\
 g(\theta_{\xi}) = \xi^{\eta - 1} e^{-\tau \xi} \rightarrow e^{-\xi}
 \tag{2.16}
 \end{equation}\]</span></p>
-<p>So the inner integral from <a href="#eq:ximoments">(2.13)</a> becomes</p>
-<p><span class="math display" id="eq:sc1">\[\begin{equation}
+<p>The inner integral from <a href="#eq:ximoments">(2.13)</a> evaluates to</p>
+<p><span class="math display" id="eq:sc1-innerint">\[\begin{align}
 \int_{p_1 = 0}^{1}
       h(\theta_{p_1}) \cdot k(\theta_{\xi, p_1})
   \, d p_1
-= \int_{p_1 = 0}^{1}
+&amp;= \int_{p_1 = 0}^{1}
   \left(1 - e^{-p_1 \xi}\right) e^{-p_1 \xi}
-  \, d p_1
+  \, d p_1 \\
+&amp;= \frac{1 - 2 e^{-\xi} + e^{-2 \xi}}
+  {2 \xi}
 \tag{2.17}
-\end{equation}\]</span></p>
-<p>Evaluating <a href="#eq:sc1">(2.17)</a> in SageMath (code in Appendix <a href="#sage-sc1">D.1</a>) returns</p>
-<p><span class="math display" id="eq:sc1-innerint">\[\begin{equation}
-\int_{p_1 = 0}^{1}
-  \left(1 - e^{-p_1 \xi}\right) \left(e^{-p_1 \xi}\right)
-  \, d p_1
-= \frac{{\left(e^{\left(2 \, \xi\right)} - 2 \, e^{\xi} + 1\right)} e^{\left(-2 \, \xi\right)}}
-  {2 \, \xi}
-\tag{2.18}
-\end{equation}\]</span></p>
-<div id="first-moment" class="section level4" number="2.1.4.1">
-<h4><span class="header-section-number">2.1.4.1</span> First moment</h4>
+\end{align}\]</span></p>
+<div id="first-moment" class="section level4" number="2.2.1.1">
+<h4><span class="header-section-number">2.2.1.1</span> First moment</h4>
 <p>The first moment of <span class="math inline">\(\xi\)</span>, i.e. <span class="math inline">\(j = 1\)</span>, has the outer integral (from <a href="#eq:ximoments">(2.13)</a>)</p>
 <p><span class="math display" id="eq:sc1-outerint">\[\begin{equation}
 \int_{xi = 0}^{\infty} 
-  \xi^1 e^{-\xi} \cdot 
-    \frac{{\left(e^{\left(2 \, \xi\right)} - 2 \, e^{\xi} + 1\right)} e^{\left(-2 \, \xi\right)}}
-      {2 \, \xi}
-  \, d \xi
-\tag{2.19}
+  \xi^1 e^{-\xi}
+  \cdot \frac{1 - 2 e^{-\xi} + e^{-2 \xi}}{2 \xi}
+\, d \xi
+\tag{2.18}
 \end{equation}\]</span></p>
 <p>which evaluates in SageMath to <span class="math inline">\(\frac{1}{6}\)</span>. The normalizing constant <span class="math inline">\(c&#39;\)</span> from <a href="#eq:cprime">(2.12)</a> evaluates to <span class="math inline">\(-\frac{1}{3 \, {\left(\log\left(3\right) - 2 \, \log\left(2\right)\right)}}\)</span>. Thus the expectation of <span class="math inline">\(\xi\)</span> is</p>
 <p><span class="math display" id="eq:sc1-moment1">\[\begin{equation}
 \mathrm{E}(\xi) = -\frac{1}{3 \, {\left(\log\left(3\right) - 2 \, \log\left(2\right)\right)}}
 \approx 1.1587
-\tag{2.20}
+\tag{2.19}
 \end{equation}\]</span></p>
-<p>The maximum likelihood value of <span class="math inline">\(\xi\)</span> under this parameterization is 1.3863. The difference between the ML value and the Bayesian expectation is relatively small, and may be attributable to the relative weights of the prior and the data for <span class="math inline">\(\xi\)</span>. For this special case with <span class="math inline">\(n = 2\)</span> and <span class="math inline">\(z = 1\)</span> there is very little data. The prior <span class="math inline">\(\Gamma(1, 1)\)</span> carries the weight of a single observation of <span class="math inline">\(\xi\)</span> and has expectation <span class="math inline">\(\mathrm{E}(\xi) = 1\)</span>, so while it should be considered weakly informative, its weight is non-trivial in this case.</p>
+<p>The maximum likelihood value of <span class="math inline">\(\xi\)</span> under this parameterization is 1.3863. The difference between the ML value and the Bayesian expectation may be attributable to the relative weights of the prior and the data for <span class="math inline">\(\xi\)</span>. For this special case with <span class="math inline">\(n = 2\)</span> and <span class="math inline">\(z = 1\)</span> there is very little data. The prior <span class="math inline">\(\Gamma(1, 1)\)</span> carries the weight of a single observation of <span class="math inline">\(\xi\)</span> and has expectation <span class="math inline">\(\mathrm{E}(\xi) = 1\)</span>, so while in many cases it would be considered weakly informative, its weight is non-trivial in this case.</p>
 </div>
-<div id="second-moment" class="section level4" number="2.1.4.2">
-<h4><span class="header-section-number">2.1.4.2</span> Second moment</h4>
+<div id="second-moment" class="section level4" number="2.2.1.2">
+<h4><span class="header-section-number">2.2.1.2</span> Second moment</h4>
 <p>The second moment of <span class="math inline">\(\xi\)</span> is</p>
 <p><span class="math display" id="eq:sc1-moment2">\[\begin{equation}
 \mathrm{E}(\xi^2)
 = -\frac{11}{18 \, {\left(\log\left(3\right) - 2 \, \log\left(2\right)\right)}}
 \approx 2.1243
-\tag{2.21}
+\tag{2.20}
 \end{equation}\]</span></p>
 </div>
-<div id="variance" class="section level4" number="2.1.4.3">
-<h4><span class="header-section-number">2.1.4.3</span> Variance</h4>
+<div id="variance" class="section level4" number="2.2.1.3">
+<h4><span class="header-section-number">2.2.1.3</span> Variance</h4>
 <p>The variance is</p>
 <p><span class="math display" id="eq:sc1-var">\[\begin{equation}
 \mathrm{E}(\xi^2) - \left(\mathrm{E}(\xi)\right)^2 = 2.1243 - 1.1587^2 = 0.7817
-\tag{2.22}
+\tag{2.21}
 \end{equation}\]</span></p>
 </div>
-<div id="posterior-distribution" class="section level4" number="2.1.4.4">
-<h4><span class="header-section-number">2.1.4.4</span> Posterior distribution</h4>
+<div id="posterior-distribution" class="section level4" number="2.2.1.4">
+<h4><span class="header-section-number">2.2.1.4</span> Posterior distribution</h4>
 <p>The gamma distribution of the posterior is parameterized by solving the system of equations for <span class="math inline">\(\eta\)</span> and <span class="math inline">\(\tau\)</span></p>
 <p><span class="math display" id="eq:postetatau">\[\begin{align}
 \frac{\eta}{\tau} &amp;= \mathrm{E}(\xi) \\
 \frac{\eta}{\tau^2} &amp;= \mathrm{Var}(\xi)
-\tag{2.23}
+\tag{2.22}
 \end{align}\]</span></p>
 <p>resulting in the posterior distribution <span class="math inline">\(\Gamma(\eta = 1.718, \tau = 1.482)\)</span>.</p>
 
@@ -559,6 +555,10 @@ Figure 2.1: Prior distribution of <span class="math inline">\(\xi\)</span> is gr
 </p>
 </div>
 </div>
+</div>
+<div id="special-case-2" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Special case 2</h3>
+<p>This case</p>
 </div>
 </div>
 </div>
